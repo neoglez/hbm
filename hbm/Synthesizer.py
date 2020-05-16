@@ -1,9 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Tue Oct  9 09:47:47 2018
-
-@author: yansel
-"""
 import numpy as np
 
 try:
@@ -16,9 +11,9 @@ except:
     pass
 import time
 import math
+import hbm
 
 from random import choice
-from OSmpl import HumanDimensions, OSmplTemplate, OSmpl
 
 
 class Synthesizer:
@@ -52,10 +47,10 @@ class Synthesizer:
 
     def synthesize_human(self, betas, gender):
         if self.human_model == "smpl":
-            # Apply the betas to the corresponding model depending on the gender.
+            # Apply the betas to the corresponding model depending on gender.
             # Note that we are synthesizing humans in the rest pose, therefore,
-            # we do not have to worry about the conribution of the pose blend
-            # shapes (see paragraph 7 in page 102).
+            # we do not have (want) to worry about the conribution of the pose
+            # blend shapes (see paragraph 7 in page 102).
             if gender in ("f", "female"):
                 self.smpl_female_model.apply_shape_blend_shapes(betas)
                 return True
@@ -145,7 +140,7 @@ class Synthesizer:
                     self.smpl_female_model.write_annotations_to_file(
                         outjson_path
                     )
-                    ## Print message
+                    # Print message
                     print("..Annotation for mesh saved to: ", outjson_path)
                 if (
                     already_synthesized_males < self.number_of_male_models
@@ -162,9 +157,9 @@ class Synthesizer:
                     )
                     self.save_human_mesh("male", outmesh_path)
 
-                    ## Calculate the height
+                    # Calculate the height
                     self.smpl_male_model.calculate_all_dimensions_from_mesh
-                    ## Write betas and height to json file
+                    # Write betas and height to json file
                     outjson_path = "./male_mesh_anno_%0.*d.json" % (
                         padding_m,
                         already_synthesized_males,
@@ -177,7 +172,7 @@ class Synthesizer:
                     self.smpl_male_model.write_annotations_to_file(
                         outjson_path
                     )
-                    ## Print message
+                    # Print message
                     print("..Annotation for mesh saved to: ", outjson_path)
 
 
@@ -186,8 +181,12 @@ if __name__ == "__main__":
     ####################################################################
     # Load the models kindly provided by Loper et al., 2015.           #
     ####################################################################
-    SMPL_basicModel_f_lbs_path = "./basicModel_f_lbs_10_207_0_v1.0.0.pkl"
-    SMPL_basicModel_m_lbs_path = "./basicmodel_m_lbs_10_207_0_v1.0.0.pkl"
+    SMPL_basicModel_f_lbs_path = (
+        "../datageneration/smpl_data/basicModel_f_lbs_10_207_0_v1.0.0.pkl"
+    )
+    SMPL_basicModel_m_lbs_path = (
+        "../datageneration/smpl_data/basicmodel_m_lbs_10_207_0_v1.0.0.pkl"
+    )
 
     try:
         # Load pkl created in python 2.x with python 2.x
@@ -205,7 +204,7 @@ if __name__ == "__main__":
     ####################################################################
     # Initialize the Osmpl female and male template.                   #
     ####################################################################
-    new_female_template = OSmplTemplate(
+    new_female_template = hbm.OSmplTemplate(
         female_model.get("v_template"),
         female_model.get("f"),
         None,
@@ -213,7 +212,7 @@ if __name__ == "__main__":
         None,
         None,
     )
-    new_male_template = OSmplTemplate(
+    new_male_template = hbm.OSmplTemplate(
         male_model.get("v_template"),
         male_model.get("f"),
         None,
@@ -225,10 +224,10 @@ if __name__ == "__main__":
     ####################################################################
     # Once we have the template we instanciate the complete model.     #
     ####################################################################
-    human_female_model = OSmpl(
+    human_female_model = hbm.OSmplWithPose(
         new_female_template, female_model.get("shapedirs").x, None, None
     )
-    human_male_model = OSmpl(
+    human_male_model = hbm.OSmplWithPose(
         new_male_template, male_model.get("shapedirs").x, None, None
     )
 
@@ -237,8 +236,8 @@ if __name__ == "__main__":
     # In our case this is 6890 x 3 x 10 for both female and male models.
     number_of_PCAs = female_model.get("shapedirs").shape[-1]
 
-    hbm_dataset_path = "../H-DIM-Project"
-    hbm_dataset_path = "../H_DIM_Project/"
+    hbm_dataset_path = "../"
+    hbm_dataset_path = "../"
 
     synthesizer = Synthesizer(
         "smpl",
